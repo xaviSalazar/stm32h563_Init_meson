@@ -13,7 +13,7 @@ project(
 ### EDIT THESE PARAMETERS FOR YOUR BOARD.
 #=============================================
 # Include the required modules to compile the projects!!!
-stm32_hal_components = ['cortex','usb', 'adc', 'dma', 'eth', 'exti', 'flash', 'gpio',
+stm32_hal_components = ['cortex','pwm', 'tim', 'usb', 'adc', 'dma', 'eth', 'exti', 'flash', 'gpio',
 	 'icache', 'pcd', 'pwr', 'rcc', 'uart', 'upcd']
 	 
 stm32_chip_family = 'STM32H5'
@@ -40,6 +40,8 @@ stm32_cube_inc = include_directories(
     stm32_cube_dir + '/Drivers/CMSIS/Include',
     stm32_cube_dir + '/Drivers/' + stm32_chip_family + 'xx_HAL_Driver/Inc/',
     stm32_cube_dir + '/Drivers/CMSIS/Device/ST/' + stm32_chip_family + 'xx/Include/',
+    # Add the Nucleo component (only needed for nucleo board)
+    stm32_cube_dir + '/Drivers/BSP/' + stm32_chip_family + 'xx_Nucleo/',
   ])
   
  
@@ -51,7 +53,11 @@ stm32_cmsis_src = []
 stm32_driver_src_prefix = stm32_cube_dir + '/Drivers/' + stm32_chip_family + 'xx_HAL_Driver/Src/' + stm32_chip_family.to_lower() + 'xx_hal'
   
  stm32_driver_src_ll_prefix = stm32_cube_dir + '/Drivers/' + stm32_chip_family + 'xx_HAL_Driver/Src/' + stm32_chip_family.to_lower() + 'xx_ll'
-                               
+
+
+# Add the Nucleo component (only needed for nucleo board)
+  stm32_cube_src += stm32_cube_dir + '/Drivers/BSP/' + stm32_chip_family + 'xx_Nucleo/' +  'stm32h5xx_nucleo.c'
+                      
 # Add the HAL component
 stm32_cube_src += stm32_driver_src_prefix + '.c'
 
@@ -104,8 +110,7 @@ stm32_app = executable('stm32_app.elf',
   'Core/Src/main.c',
   'Core/Src/stm32h5xx_hal_msp.c',
   'Core/Src/stm32h5xx_it.c',
-  'Core/Src/syscalls.c',
-  'Core/Src/sysmem.c',
+
   
   include_directories : [
     headers_inc,
