@@ -27,14 +27,24 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h5xx_hal.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 #include "stm32h5xx_nucleo.h"
+#include "stm32h5xx_ll_bus.h"
+#include "stm32h5xx_ll_rcc.h"
+#include "stm32h5xx_ll_system.h"
+#include "stm32h5xx_ll_utils.h"
+#include "stm32h5xx_ll_gpio.h"
+#include "stm32h5xx_ll_exti.h"
+#include "stm32h5xx_ll_usart.h"
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
+
+/* USER CODE BEGIN EFP */
+/* IRQ Handler treatment functions */
+void UART_CharReception_Callback(void); 
+void UART_Error_Callback(void); 
 
 //#define PRESCALER_VALUE     (uint32_t)(((SystemCoreClock) / 100) - 1)
 

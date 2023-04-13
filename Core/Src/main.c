@@ -24,12 +24,13 @@
 
 static GPIO_InitTypeDef  GPIO_InitStruct;
 
-TIM_HandleTypeDef    htim1;
+TIM_HandleTypeDef    htim3;
+UART_HandleTypeDef huart3;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-// static void MX_TIM1_Init(void);
+static void MX_USART3_UART_Init(void);
 static void MX_TIM3_Init(void);
 
 /**
@@ -58,6 +59,12 @@ int main(void)
 
   /* Configure LED3 */
   BSP_LED_Init(LED3);
+
+  MX_USART3_UART_Init();
+
+  /* Enable RXNE and Error interrupts */  
+  LL_USART_EnableIT_RXNE(USART3);
+  LL_USART_EnableIT_ERROR(USART3);
   
   /* Configura pin PB */
   __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -81,25 +88,25 @@ int main(void)
   MX_TIM3_Init();
 /*## Start PWM signals generation #######################################*/
   /* Start channel 1 */
-  // if (HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1) != HAL_OK)
+  // if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1) != HAL_OK)
   // {
   //   /* PWM Generation Error */
   //   Error_Handler();
   // }
   /* Start channel 2 */
-  if (HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2) != HAL_OK)
+  if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2) != HAL_OK)
   {
     /* PWM Generation Error */
     Error_Handler();
   }
   /* Start channel 3 */
-  if (HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3) != HAL_OK)
+  if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_3) != HAL_OK)
   {
     /* PWM generation Error */
     Error_Handler();
   }
   // /* Start channel 4 */
-  // if (HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4) != HAL_OK)
+  // if (HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_4) != HAL_OK)
   // {
   //   /* PWM generation Error */
   //   Error_Handler();
@@ -178,22 +185,22 @@ static void MX_TIM3_Init(void)
   TIM_OC_InitTypeDef sConfigOC = {0};
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
-  // htim1.Instance = TIM1;
-  htim1.Instance = TIM3;
-  htim1.Init.Prescaler = PRESCALER_VALUE;
-  htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = PERIOD_VALUE;
-  htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim1.Init.RepetitionCounter = 0;
-  htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-  if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
+  // htim3.Instance = TIM1;
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = PRESCALER_VALUE;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = PERIOD_VALUE;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.RepetitionCounter = 0;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_PWM_Init(&htim3) != HAL_OK)
   {
     Error_Handler();
   }
   sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
   sMasterConfig.MasterOutputTrigger2 = TIM_TRGO2_RESET;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim1, &sMasterConfig) != HAL_OK)
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
   {
     Error_Handler();
   }
@@ -205,24 +212,24 @@ static void MX_TIM3_Init(void)
   sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;
   sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET;
 
-  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
   }
 
   sConfigOC.Pulse = PULSE1_VALUE;
-  if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
 
   // sConfigOC.Pulse = PULSE3_VALUE;
-  // if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
+  // if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   // {
   //   Error_Handler();
   // }
   // sConfigOC.Pulse = PULSE4_VALUE;
-  // if (HAL_TIM_PWM_ConfigChannel(&htim1, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
+  // if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_4) != HAL_OK)
   // {
   //   Error_Handler();
   // }
@@ -239,11 +246,11 @@ static void MX_TIM3_Init(void)
   // sBreakDeadTimeConfig.Break2Filter = 0;
   // sBreakDeadTimeConfig.Break2AFMode = TIM_BREAK_AFMODE_INPUT;
   // sBreakDeadTimeConfig.AutomaticOutput = TIM_AUTOMATICOUTPUT_DISABLE;
-  // if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, &sBreakDeadTimeConfig) != HAL_OK)
+  // if (HAL_TIMEx_ConfigBreakDeadTime(&htim3, &sBreakDeadTimeConfig) != HAL_OK)
   // {
   //   Error_Handler();
   // }
-  HAL_TIM_MspPostInit(&htim1);
+  HAL_TIM_MspPostInit(&htim3);
 
 }
 
@@ -261,6 +268,105 @@ static void MX_GPIO_Init(void)
 }
 
 /**
+  * @brief USART3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART3_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART3_Init 0 */
+
+  /* USER CODE END USART3_Init 0 */
+
+  /* USER CODE BEGIN USART3_Init 1 */
+
+  /* USER CODE END USART3_Init 1 */
+  huart3.Instance = USART3;
+  huart3.Init.BaudRate = 9600;
+  huart3.Init.WordLength = UART_WORDLENGTH_8B;
+  huart3.Init.StopBits = UART_STOPBITS_1;
+  huart3.Init.Parity = UART_PARITY_ODD;
+  huart3.Init.Mode = UART_MODE_TX_RX;
+  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart3.Init.ClockPrescaler = UART_PRESCALER_DIV1;
+  huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetTxFifoThreshold(&huart3, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_SetRxFifoThreshold(&huart3, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  if (HAL_UARTEx_DisableFifoMode(&huart3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART3_Init 2 */
+
+  /* USER CODE END USART3_Init 2 */
+
+}
+
+/**
+  * @brief  Rx Transfer completed callback
+  * @note   This example shows a simple way to report end of IT Rx transfer, and 
+  *         you can add your own implementation.
+  * @retval None
+  */
+void UART_CharReception_Callback(void)
+{
+  __IO uint32_t received_char;
+
+  /* Read Received character. RXNE flag is cleared by reading of RDR register */
+  received_char = LL_USART_ReceiveData8(USART3);
+
+  /* Check if received value is corresponding to specific one : S or s */
+  if ((received_char == 'S') || (received_char == 's'))
+  {
+    /* Turn LED1 On : Expected character has been received */
+    BSP_LED_On(LED3);
+  }
+}
+
+/**
+  * @brief  UART error callbacks
+  * @note   This example shows a simple way to report transfer error, and you can
+  *         add your own implementation.
+  * @retval None
+  */
+void UART_Error_Callback(void)
+{
+  __IO uint32_t isr_reg;
+
+  /* Disable USARTx_IRQn */
+  NVIC_DisableIRQ(USART3_IRQn);
+  
+  /* Error handling example :
+    - Read USART ISR register to identify flag that leads to IT raising
+    - Perform corresponding error handling treatment according to flag
+  */
+  isr_reg = LL_USART_ReadReg(USART3, ISR);
+  if (isr_reg & LL_USART_ISR_NE)
+  {
+    /* Turn LED3 on: Transfer error in reception/transmission process */
+    BSP_LED_On(LED3);
+  }
+  else
+  {
+    /* Turn LED3 on: Transfer error in reception/transmission process */
+    BSP_LED_On(LED3);
+  }
+}
+
+/**
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
@@ -274,6 +380,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
+
 
 #ifdef  USE_FULL_ASSERT
 /**

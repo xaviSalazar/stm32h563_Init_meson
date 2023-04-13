@@ -36,7 +36,7 @@
 /* USER CODE BEGIN PD */
  
 /* USER CODE END PD */
-
+extern UART_HandleTypeDef huart3;
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
@@ -201,6 +201,50 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32h5xx.s).                    */
 /******************************************************************************/
 
+/**
+  * @brief This function handles USART3 global interrupt.
+  */
+void USART3_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART3_IRQn 0 */
+  /* Customize process using LL interface to improve the performance (exhaustive feature management not handled) */
+
+  /* Check RXNE flag value in ISR register */
+  if(LL_USART_IsActiveFlag_RXNE(USART3) && LL_USART_IsEnabledIT_RXNE(USART3))
+  {
+    /* RXNE flag will be cleared by reading of RDR register (done in call) */
+    /* Call function in charge of handling Character reception */
+    UART_CharReception_Callback();
+  }
+
+  // if(LL_USART_IsEnabledIT_TXE(USART3) && LL_USART_IsActiveFlag_TXE(USART3))
+  // {
+  //   /* TXE flag will be automatically cleared when writing new data in TDR register */
+
+  //   /* Call function in charge of handling empty DR => will lead to transmission of next character */
+  //   UART_TXEmpty_Callback();
+  // }
+
+  // if(LL_USART_IsEnabledIT_TC(USART3) && LL_USART_IsActiveFlag_TC(USART3))
+  // {
+  //   /* Clear TC flag */
+  //   LL_USART_ClearFlag_TC(USART3);
+  //   /* Call function in charge of handling end of transmission of sent character
+  //      and prepare next character transmission */
+  //   UART_CharTransmitComplete_Callback();
+  // }
+
+  if(LL_USART_IsEnabledIT_ERROR(USART3) && LL_USART_IsActiveFlag_NE(USART3))
+  {
+    /* Call Error function */
+    UART_Error_Callback();
+  }
+  /* USER CODE END USART3_IRQn 0 */
+  HAL_UART_IRQHandler(&huart3);
+  /* USER CODE BEGIN USART3_IRQn 1 */
+
+  /* USER CODE END USART3_IRQn 1 */
+}
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
