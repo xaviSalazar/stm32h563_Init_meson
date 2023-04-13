@@ -217,22 +217,22 @@ void USART3_IRQHandler(void)
     UART_CharReception_Callback();
   }
 
-  // if(LL_USART_IsEnabledIT_TXE(USART3) && LL_USART_IsActiveFlag_TXE(USART3))
-  // {
-  //   /* TXE flag will be automatically cleared when writing new data in TDR register */
+  if(LL_USART_IsEnabledIT_TXE(USART3) && LL_USART_IsActiveFlag_TXE(USART3))
+  {
+    /* TXE flag will be automatically cleared when writing new data in TDR register */
 
-  //   /* Call function in charge of handling empty DR => will lead to transmission of next character */
-  //   UART_TXEmpty_Callback();
-  // }
+    /* Call function in charge of handling empty DR => will lead to transmission of next character */
+    UART_TXEmpty_Callback();
+  }
 
-  // if(LL_USART_IsEnabledIT_TC(USART3) && LL_USART_IsActiveFlag_TC(USART3))
-  // {
-  //   /* Clear TC flag */
-  //   LL_USART_ClearFlag_TC(USART3);
-  //   /* Call function in charge of handling end of transmission of sent character
-  //      and prepare next character transmission */
-  //   UART_CharTransmitComplete_Callback();
-  // }
+  if(LL_USART_IsEnabledIT_TC(USART3) && LL_USART_IsActiveFlag_TC(USART3))
+  {
+    /* Clear TC flag */
+    LL_USART_ClearFlag_TC(USART3);
+    /* Call function in charge of handling end of transmission of sent character
+       and prepare next character transmission */
+    UART_CharTransmitComplete_Callback();
+  }
 
   if(LL_USART_IsEnabledIT_ERROR(USART3) && LL_USART_IsActiveFlag_NE(USART3))
   {

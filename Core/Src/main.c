@@ -20,12 +20,18 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+// to change printf to uart 
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
 
 
 static GPIO_InitTypeDef  GPIO_InitStruct;
 
 TIM_HandleTypeDef    htim3;
 UART_HandleTypeDef huart3;
+
+__IO uint8_t ubSend = 0;
+const uint8_t aStringToSend[] = "STM32H5xx USART LL API Example : TX in IT mode\r\nConfiguration UART 115200 bps, 8 data bit/1 stop bit/No parity/No HW flow control\r\n";
+uint8_t ubSizeToSend = sizeof(aStringToSend);
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -59,13 +65,21 @@ int main(void)
 
   /* Configure LED3 */
   BSP_LED_Init(LED3);
+  BSP_LED_Init(LED2);
 
   MX_USART3_UART_Init();
 
   /* Enable RXNE and Error interrupts */  
   LL_USART_EnableIT_RXNE(USART3);
   LL_USART_EnableIT_ERROR(USART3);
+
   
+  // LL_USART_TransmitData8(USART3, aStringToSend[ubSend++]);
+
+  printf("\n\r ACTIVATED UART in example_meson \n\r");
+  /* Enable TXE interrupt */
+  // LL_USART_EnableIT_TXE(USART3);
+
   /* Configura pin PB */
   __HAL_RCC_GPIOB_CLK_ENABLE();
     GPIO_InitStruct.Pin = GPIO_PIN_5 | GPIO_PIN_0;
@@ -117,7 +131,6 @@ int main(void)
   while (1)
   {
   }
-
 }
 
 /**
@@ -275,13 +288,6 @@ static void MX_GPIO_Init(void)
 static void MX_USART3_UART_Init(void)
 {
 
-  /* USER CODE BEGIN USART3_Init 0 */
-
-  /* USER CODE END USART3_Init 0 */
-
-  /* USER CODE BEGIN USART3_Init 1 */
-
-  /* USER CODE END USART3_Init 1 */
   huart3.Instance = USART3;
   huart3.Init.BaudRate = 9600;
   huart3.Init.WordLength = UART_WORDLENGTH_8B;
@@ -309,9 +315,6 @@ static void MX_USART3_UART_Init(void)
   {
     Error_Handler();
   }
-  /* USER CODE BEGIN USART3_Init 2 */
-
-  /* USER CODE END USART3_Init 2 */
 
 }
 
@@ -335,6 +338,44 @@ void UART_CharReception_Callback(void)
     BSP_LED_On(LED3);
   }
 }
+
+/**
+  * @brief  Function called for achieving next TX Byte sending
+  * @retval None
+  */
+void UART_TXEmpty_Callback(void)
+{
+  if (ubSend == (ubSizeToSend - 1))
+  {
+    /* Disable TXE interrupt */
+    LL_USART_DisableIT_TXE(USART3);
+
+    /* Enable TC interrupt */
+    LL_USART_EnableIT_TC(USART3);
+  }
+
+  /* Fill TDR with a new char */
+  LL_USART_TransmitData8(USART3, aStringToSend[ubSend++]);
+}
+
+/**
+  * @brief  Function called at completion of last byte transmission
+  * @retval None
+  */
+void UART_CharTransmitComplete_Callback(void)
+{
+  if (ubSend == sizeof(aStringToSend))
+  {
+    ubSend = 0;
+
+    /* Disable TC interrupt */
+    LL_USART_DisableIT_TC(USART3);
+
+    /* Turn LED1 On at end of transfer : Tx sequence completed successfully */
+    BSP_LED_On(LED2);
+  }
+}
+
 
 /**
   * @brief  UART error callbacks
@@ -367,6 +408,19 @@ void UART_Error_Callback(void)
 }
 
 /**
+  * @brief  Retargets the C library printf function to the USART.
+  * @param  None
+  * @retval None
+  */
+PUTCHAR_PROTOTYPE
+{
+  /* Place your implementation of fputc here */
+  /* e.g. write a character to the USART3 and Loop until the end of transmission */
+  HAL_UART_Transmit(&huart3, (uint8_t *)&ch, 1, 0xFFFF);
+  return ch;
+}
+
+/**
   * @brief  This function is executed in case of error occurrence.
   * @retval None
   */
@@ -380,7 +434,6 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
 
 #ifdef  USE_FULL_ASSERT
 /**

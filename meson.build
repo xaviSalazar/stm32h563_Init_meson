@@ -110,6 +110,8 @@ stm32_app = executable('stm32_app.elf',
   'Core/Src/main.c',
   'Core/Src/stm32h5xx_hal_msp.c',
   'Core/Src/stm32h5xx_it.c',
+  'Core/Src/syscalls.c',
+  'Core/Src/sysmem.c',
 
   
   include_directories : [

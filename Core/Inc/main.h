@@ -26,7 +26,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32h5xx_hal.h"
-
+#include <stdio.h>
 #include "stm32h5xx_nucleo.h"
 #include "stm32h5xx_ll_bus.h"
 #include "stm32h5xx_ll_rcc.h"
@@ -45,6 +45,8 @@ void Error_Handler(void);
 /* IRQ Handler treatment functions */
 void UART_CharReception_Callback(void); 
 void UART_Error_Callback(void); 
+void UART_TXEmpty_Callback(void); 
+void UART_CharTransmitComplete_Callback(void); 
 
 //#define PRESCALER_VALUE     (uint32_t)(((SystemCoreClock) / 100) - 1)
 
