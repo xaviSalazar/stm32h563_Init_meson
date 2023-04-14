@@ -30,7 +30,7 @@ TIM_HandleTypeDef    htim3;
 UART_HandleTypeDef huart3;
 
 __IO uint8_t ubSend = 0;
-const uint8_t aStringToSend[] = "STM32H5xx USART LL API Example : TX in IT mode\r\nConfiguration UART 115200 bps, 8 data bit/1 stop bit/No parity/No HW flow control\r\n";
+const uint8_t aStringToSend[] = "STM32H5xx USART LL API Example : TX in IT mode\r\nConfiguration UART 9600 bps, 8 data bit/1 stop bit/No parity/No HW flow control\r\n";
 uint8_t ubSizeToSend = sizeof(aStringToSend);
 
 /* Private function prototypes -----------------------------------------------*/
@@ -74,11 +74,10 @@ int main(void)
   LL_USART_EnableIT_ERROR(USART3);
 
   
-  // LL_USART_TransmitData8(USART3, aStringToSend[ubSend++]);
-
-  printf("\n\r ACTIVATED UART in example_meson \n\r");
+  LL_USART_TransmitData8(USART3, aStringToSend[ubSend++]);
+  // printf("\n\r ACTIVATED UART in example_meson \n\r");
   /* Enable TXE interrupt */
-  // LL_USART_EnableIT_TXE(USART3);
+  LL_USART_EnableIT_TXE(USART3);
 
   /* Configura pin PB */
   __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -332,7 +331,7 @@ void UART_CharReception_Callback(void)
   received_char = LL_USART_ReceiveData8(USART3);
 
   /* Check if received value is corresponding to specific one : S or s */
-  if ((received_char == 'S') || (received_char == 's'))
+  if ((received_char == 's') || (received_char == 'S'))
   {
     /* Turn LED1 On : Expected character has been received */
     BSP_LED_On(LED3);

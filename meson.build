@@ -86,7 +86,7 @@ stm32_cmsis_src += stm32_cmsis_system
 stm32_cmsis_src += stm32_cmsis_startup
 
 # cube args
-stm32_cube_args = ['-D' + stm32_chip_family, '-D' + stm32_chip_series + stm32_chip_type, '-DUSE_FULL_LL_DRIVER']
+stm32_cube_args = ['-D' + stm32_chip_family, '-D' + stm32_chip_series + stm32_chip_type, '-DUSE_FULL_LL_DRIVER', '-DUSE_HAL_DRIVER']
 
 stm32_cube_dep = declare_dependency(
   sources : [stm32_cube_src],
