@@ -11,7 +11,7 @@
    for the board in this case STM32H563ZI.
 
 ```
-meson build --cross-file stm32-meson/stm32h5.build -Dstm32_chip=STM32H563ZI -Dstm32_cube_dir=$HOME/STM32CubeH5-main
+meson build --cross-file stm32h5.ini
 ```
 
 then go to build/
