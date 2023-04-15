@@ -10,12 +10,8 @@
 3. Also you need to download the firmware header and source files
    for the board in this case STM32H563ZI.
 
-```
-meson build --cross-file stm32h5.ini
-```
+###`meson build --cross-file stm32h5.ini`
 
 then go to build/
 
-```
-ninja
-```
+###`ninja`
