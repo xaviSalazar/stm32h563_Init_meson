@@ -15,3 +15,7 @@
 then go to build/
 
 ### `ninja`
+
+### USE A TERMINAL IN YOUR UNIX SYSTEM
+1. This script configures uart to 9600, raw, etc 
+### `bash run.sh`
